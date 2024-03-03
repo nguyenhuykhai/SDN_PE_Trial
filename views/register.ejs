@@ -25,6 +25,10 @@
               <h1><%= message %></h1>
             <% } %>
 
+            <% if(typeof error !== 'undefined' && error !== undefined) { %>
+              <h1><%= error %></h1>
+            <% } %>
+
             <form action="/auth/register" method="POST">
               <!-- Email input -->
               <div class="form-outline mb-4">

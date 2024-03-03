@@ -1,67 +1,93 @@
 const Members = require('../models/members')
+const Course = require('../models/courses')
 const bcrypt = require('bcrypt')
 const passport = require('passport');
+const jwt = require('jsonwebtoken');
 class MemberController {
     regis(req, res) {
         res.render('register', { message: 'Trang đăng ký' });
     }
     handleRegis(req, res, next) {
         const { username, password } = req.body;
-        let errors = [];
+        let error = undefined;
         if (!username || !password) {
-            errors.push({ msg: 'Please enter all fields' });
+            error = 'Nhập toàn bộ field';
         }
-        if (password.lenght < 6) {
-            errors.push({ msg: 'Password must be at least 6 characters' });
+        if (password.length < 6) {
+            error = 'Password ít nhất 6 ký tự';
         }
-        if (errors.lenght > 0) {
-            res.render('resgister', {
-                errors, username, password
+        if (error !== undefined) {
+            res.render('register', {
+                error, username, password
             });
         } else {
             Members.findOne({ username: username }).then(user => {
                 if (user) {
-                    errors.push({ msg: 'Username already exist' });
+                    error = 'Tài khoản đã tồn tại';
                     res.render('register', {
-                        errors, username, password
+                        error, username, password
                     });
                 } else {
                     const newMember = new Members({ username, password })
-                };
-                //Hash password
-                bcrypt.hash(newUser.password, 10, function (err, hash) {
-                    if (err) throw err;
-                    newUser.password = hash;
-                    newUser.save()
-                        .then(user => {
-                            res.rendirect('/auth/login')
-                        })
-                        .catch(next);
-                })
+                    //Hash password
+                    bcrypt.hash(newMember.password, 10, function (err, hash) {
+                        if (err) throw err;
+                        newMember.password = hash;
+                        newMember.save()
+                            .then(user => {
+                                const token = jwt.sign({ _id: user.id, username: user.username }, 'SDN301m');
+                                res.render('home', { token })
+                            })
+                            .catch(next);
+                    })
+                }
             })
         }
     }
     login(req, res) {
         res.render('login', { message: 'Trang đăng nhập' });
     }
-    handleLogin(req, res) {
-        try {
-            // Kiểm tra tài khoản có tồn tại chưa
-            const foundUser = Members.findOne({ username: req.body.username })
-            if (foundUser) {
-                const checkPassword = Members.findOne({ username: req.body.username, password: req.body.password })
-                if (checkPassword) {
-                    res.render('home', { message: 'Đăng nhập thành công', user: checkPassword })
-                } else {
-                    res.render('login', { message: 'Sai mật khẩu' })
+    handleLogin(req, res, next) {
+        passport.authenticate('local', {
+            failureRedirect: '/auth',
+            failureFlash: true
+        })(req, res, async function(err) {
+            if (err) {
+                res.render('login', { error: 'Đăng nhập không thành công' })
+            }
+            if (req.user) {
+                let user = {
+                    _id: req.user._id,
+                    username: req.user.username,
+                    token: jwt.sign({ _id: req.user._id, username: req.user.username }, 'SDN301m')
+                }
+                let data = [];
+                let error = undefined;
+                try {
+                    Course.find().then(courses => {
+                        if (courses) {
+                            data.push(...courses)
+                            res.render('home', { data, error, user })
+                        } else {
+                            res.render('home', { data, error: 'Lấy danh sách không thành công', user: req.user })
+                        }
+                    })
+                } catch (error) {
+                    res.render('home', { data, error: 'Lấy danh sách không thành công', user: req.user })
                 }
             } else {
-                res.render('login', { message: 'Tài khoản không tồn tại' })
+                res.render('login', { error: 'Đăng nhập không thành công' })
             }
-        } catch (error) {
-            res.render('error', { message: error.message });
-        }
+        });
     }
+    signout(req, res, next) {
+        req.logout(function (err) {
+            if (err) { return next(err); }
+            req.flash('success_msg', 'Đăng xuất thành công');
+            res.render('/login', { message: 'Đăng xuất thành công' });
+        })
+    }
+
 }
 
 module.exports = new MemberController

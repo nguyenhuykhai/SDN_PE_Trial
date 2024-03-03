@@ -6,8 +6,9 @@ var logger = require('morgan');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 
-var indexRouter = require('./routes');
+var courseRouter = require('./routes/course');
 var authRouter = require('./routes/auth');
+const { jwtDecode } = require('./config/auth')
 
 const session = require('express-session');
 const passport = require('passport');
@@ -44,7 +45,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
+app.use('/', courseRouter);
 app.use('/auth', authRouter);
 
 // Connect to MongoDB

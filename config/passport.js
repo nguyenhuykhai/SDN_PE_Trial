@@ -2,6 +2,8 @@ const passport = require('passport')
 const bcrypt = require('bcrypt')
 const LocalStrategy = require('passport-local').Strategy
 const Members = require('../models/members');
+const jwt = require('jsonwebtoken');
+
 module.exports = function (passport) {
     passport.use(
         new LocalStrategy({ usernameField: 'username' }, (username, password, done) => {
@@ -9,7 +11,7 @@ module.exports = function (passport) {
             Members.findOne({ username: username })
                 .then(member => {
                     if (!member) {
-                        return done(null, false, { message: 'This username is not registed' });
+                        return done(null, false, { message: 'Tài khoản không tồn tại' });
                     }
                     //Match password
                     bcrypt.compare(password, member.password, (err, isMatch) => {
@@ -18,12 +20,11 @@ module.exports = function (passport) {
                             return done(null, member);
                         }
                         else {
-                            return done(null, false, { message: 'Password is incorrect' });
+                            return done(null, false, { message: 'Sai mật khẩu' });
                         }
                     })
                 })
                 .catch(err => console.log(err));
-
         })
     )
     passport.serializeUser(function (member, done) {
