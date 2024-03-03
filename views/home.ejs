@@ -12,62 +12,70 @@
 <body>
     <!-- Include file header.ejs -->
     <%- include('header') -%>
-    
-    <section style="background-color: #eee;">
-        <div class="container py-5">
-            <div class="row">
-                <% if (user && user !== undefined) { %>
-                    <p><%= user._id %></p>
-                    <p><%= user.username %></p>
-                    <p><%= user.token %></p>
+        <section style="background-color: #eee;">
+            <div class="container py-5">
+                <!-- Hiển thị message gửi từ phía Server -->
+                <% if(typeof message !== 'undefined' && message !== undefined) { %>
+                    <h1><%= message %></h1>
                 <% } %>
-                <% if(data !== undefined && data.length > 0) { %>
+                <% if(typeof error !== 'undefined' && error !== undefined) { %>
+                    <h1><%= error %></h1>
+                <% } %>
+
+                <div class="row">
+                    <% if(typeof data !=='undefined' && data.length> 0 && typeof user !== 'undefined' && user.token !== undefined) { %>
                         <% data.forEach(function(item){ %>
                             <div class="col-md-12 col-lg-4 mb-4 mb-lg-4">
                                 <div class="card text-black">
-                                    <img src="<%= item.thumbnail %>"
-                                        class="card-img-top" alt="iPhone" />
-                                    <div class="card-body">
-                                        <div class="text-center mt-1">
-                                            <h4 class="card-title"><%= item.title %></h4>
-                                            <h6 class="mb-1 pb-3"><%= item.titleDescription %></h6>
-                                        </div>
-            
-                                        <div class="text-center">
-                                            <div class="p-3 mx-n3 mb-4" style="background-color: #eff1f2;">
-                                                <h5 class="mb-0 text-uppercase">Mô tả</h5>
+                                    <img src="<%= item.thumbnail %>" class="card-img-top" alt="iPhone" />
+                                        <div class="card-body">
+                                            <div class="text-center mt-1">
+                                                <h4 class="card-title"><%= item.title %></h4>
+                                                <h6 class="mb-1 pb-3"><%= item.titleDescription %></h6>
                                             </div>
-            
-                                            <div class="d-flex flex-column mb-4">
-                                                <% if (item.type == 'free') { %>
-                                                    <span class="h1 mb-0 text-uppercase">Miễn phí</span>
-                                                <% } else { %>
-                                                    <span class="h1 mb-0 text-uppercase"><span>Giá tiền: </span><%= item.amount %></span>
-                                                <% } %>
+    
+                                            <div class="text-center">
+                                                <div class="p-3 mx-n3 mb-4" style="background-color: #eff1f2;">
+                                                    <h5 class="mb-0 text-uppercase">Mô tả</h5>
+                                                </div>
+    
+                                                <div class="d-flex flex-column mb-4">
+                                                    <% if (item.type=='free' ) { %>
+                                                        <span class="h1 mb-0 text-uppercase">Miễn phí</span>
+                                                    <% } else { %>
+                                                        <span class="h1 mb-0 text-uppercase"><span>Giá tiền: </span><%= item.amount %></span>
+                                                    <% } %>
+                                                </div>
                                             </div>
+    
+                                            <div class="d-flex flex-row">
+                                                <form action="/course/<%= item._id %>" method="POST">
+                                                    <button type="submit" class="btn btn-primary flex-fill me-1" data-mdb-ripple-color="dark">Xem thêm</button>
+                                                    <input type="hidden" name="token" value="<%= user.token %>">
+                                                    <input type="hidden" name="courseId" value="<%= item._id %>">
+                                                </form>
+                                            </div>                                            
                                         </div>
-            
-                                        <div class="d-flex flex-row">
-                                            <button type="button" class="btn btn-primary flex-fill me-1"
-                                                data-mdb-ripple-color="dark">
-                                                Xem thêm
-                                            </button>
-                                            <button type="button" class="btn btn-danger flex-fill ms-1">Thêm vào giỏ hàng</button>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         <% }) %>
                     <% } else { %>
-                        <div class="d-flex align-items-center">
-                            <strong>Loading...</strong>
-                            <div class="spinner-border ms-auto" role="status" aria-hidden="true"></div>
-                        </div>
+                            <div class="d-flex align-items-center"><strong>Loading...</strong>
+                                <div class="spinner-border ms-auto" role="status" aria-hidden="true"></div>
+                            </div>
                     <% } %>
+                </div>
             </div>
-        </div>
-    </section>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="http://getbootstrap.com/dist/js/bootstrap.min.js"></script>
+        </section>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="http://getbootstrap.com/dist/js/bootstrap.min.js"></script>
+        <% if (typeof user !="undefined" ) { %>
+            <script>
+                localStorage.setItem('_id', <% - JSON.stringify(user._id) %>)
+                localStorage.setItem('username', <% - JSON.stringify(user.username) %>)
+                localStorage.setItem('token', <% - JSON.stringify(user.token) %>)
+            </script>
+        <% } %>
 </body>
+
 </html>
