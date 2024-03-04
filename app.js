@@ -8,7 +8,6 @@ const dotenv = require('dotenv');
 
 var courseRouter = require('./routes/course');
 var authRouter = require('./routes/auth');
-const { jwtDecode } = require('./config/auth')
 
 const session = require('express-session');
 const passport = require('passport');
@@ -28,6 +27,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
+app.use(cookieParser());
 app.use(function (req, res, next) {
   res.locals.success_msg = req.flash('success_msg')
   res.locals.error_msg = req.flash('error_msg')

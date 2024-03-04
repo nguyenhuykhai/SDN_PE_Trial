@@ -1,5 +1,3 @@
-const jwt = require('jsonwebtoken')
-
 module.exports = {
     ensureAuthenticated: function (req, res, next) {
         if (req.isAuthenticated()) {
@@ -10,16 +8,11 @@ module.exports = {
         res.render('login', { error: 'Vui lòng đăng nhập' });
     },
     jwtDecode: function (req, res, next) {
-        console.log("BODY: ", req.body.token);
-        if (req.body && req.body.token) {
-            jwt.verify(req.body.token.split(' '), 'SDN301m', function(err, decode) {
-                if (err) req.user.token = undefined;
-                req.user.token = decode;
-                next();
-            });
+        let token = req.cookies.token;
+        if (token) {
+            next();
         } else {
-            req.user.token = undefined;
-            next()
+            res.render('login', { error: 'Vui lòng đăng nhập' });
         }
     }
 }

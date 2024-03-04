@@ -22,21 +22,54 @@
                 <h1><%= error %></h1>
             <% } %>
 
-            <% if(data !== undefined) { %>
-                <div class="card" style="width: 18rem;">
-                    <img src="<%= data.thumbnail %>" class="card-img-top" alt="...">
-                    <div class="card-body">
-                      <h5 class="card-title"><%= data.title %></h5>
-                      <p class="card-text"><%= data.titleDescription %></p>
-                      <% if (data.type && data.type !== 'free') { %>
-                        <p class="card-text">Giá tiền: <%= data.amount %></p>
-                        <a href="#" class="btn btn-primary">Thêm vào giỏ hảng</a>
-                      <% } else { %>
-                        <p class="card-text">Miễn phí</p>    
-                        <a href="#" class="btn btn-primary">Học ngay</a>
-                        <% } %>
+            <% if(typeof data !=='undefined' && data.length> 0) { %>
+                <div class="container text-center">
+                    <div class="row">
+                        <div class="col card" style="width: 18rem;">
+                            <img src="<%= data[0].thumbnail %>" class="card-img-top" alt="...">
+                            <div class="card-body">
+                              <h5 class="card-title"><%= data[0].title %></h5>
+                              <p class="card-text"><%= data[0].titleDescription %></p>
+                              <% if (data[0].type && data[0].type !== 'free') { %>
+                                <p class="card-text">Giá tiền: <%= data[0].amount %></p>
+                                <a href="#" class="btn btn-primary">Thêm vào giỏ hảng</a>
+                              <% } else { %>
+                                <p class="card-text">Miễn phí</p>    
+                                <a href="#" class="btn btn-primary">Học ngay</a>
+                                <% } %>
+                            </div>
+                        </div>
+                      <div class="col">
+                        <h1 class="text-uppercase">Chỉnh sửa khóa học</h1>
+                        <form action="/course/<%= data[0]._id %>/edit" method="POST">
+                            <input type="hidden" name="thumbnail" value="<%= data[0].thumbnail %>" />
+                            <input type="hidden" name="status" value="<%= data[0].status %>" />
+                            <input type="hidden" name="type" value="<%= data[0].type %>" />
+                            <input type="hidden" name="courseId" value="<%= data[0]._id %>" />
+                            <div class="mb-3">
+                                <label for="exampleFormControlInput1" class="form-label">Tiêu đề khóa học</label>
+                                <input type="text" name="title" value="<%= data[0].title %>" class="form-control" id="exampleFormControlInput1">
+                              </div>
+                              <div class="mb-3">
+                                <label for="exampleFormControlInput1" class="form-label">Mô tả</label>
+                                <input type="text" name="titleDescription" value="<%= data[0].titleDescription %>" class="form-control" id="exampleFormControlInput2">
+                              </div>
+                              <% if(data[0].type === 'free') { %>
+                                <div class="mb-3">
+                                    <label for="exampleFormControlInput1" class="form-label">Giá tiền</label>
+                                    <input type="number" name="amount" value="0"  class="form-control" id="exampleFormControlInput3">
+                                </div>
+                              <% } else { %>
+                                <div class="mb-3">
+                                    <label for="exampleFormControlInput1" class="form-label">Giá tiền</label>
+                                    <input type="number" name="<%= data[0].amount %>" value="0"  class="form-control" id="exampleFormControlInput3">
+                                </div>
+                              <% } %>
+                              <button type="submit" class="btn btn-outline-success">Lưu</button>
+                        </form>
+                      </div>
                     </div>
-                </div>
+                  </div>
             <% } else { %>
                 <div class="d-flex align-items-center">
                     <strong>Loading...</strong>

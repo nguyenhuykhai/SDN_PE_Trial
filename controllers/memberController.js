@@ -3,6 +3,7 @@ const Course = require('../models/courses')
 const bcrypt = require('bcrypt')
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
+
 class MemberController {
     regis(req, res) {
         res.render('register', { message: 'Trang đăng ký' });
@@ -35,8 +36,22 @@ class MemberController {
                         newMember.password = hash;
                         newMember.save()
                             .then(user => {
-                                const token = jwt.sign({ _id: user.id, username: user.username }, 'SDN301m');
-                                res.render('home', { token })
+                                const token = jwt.sign({ _id: user.id, username: user.username }, 'SDN301m', { expiresIn: '1h' });
+                                res.cookie('token', token, {maxAge: 900000, httpOnly: true});
+                                let data = [];
+                                let error = undefined;
+                                try {
+                                    Course.find().then(courses => {
+                                        if (courses) {
+                                            data.push(...courses)
+                                            res.render('home', { data, error })
+                                        } else {
+                                            res.render('home', { data, error: 'Lấy danh sách không thành công' })
+                                        }
+                                    })
+                                } catch (error) {
+                                    res.render('home', { data, error: 'Lấy danh sách không thành công' })
+                                }
                             })
                             .catch(next);
                     })
@@ -56,24 +71,22 @@ class MemberController {
                 res.render('login', { error: 'Đăng nhập không thành công' })
             }
             if (req.user) {
-                let user = {
-                    _id: req.user._id,
-                    username: req.user.username,
-                    token: jwt.sign({ _id: req.user._id, username: req.user.username }, 'SDN301m')
-                }
+                let user = { _id: req.user._id, username: req.user.username }
+                const token = jwt.sign({ _id: user.id, username: user.username }, 'SDN301m');
+                res.cookie('token', token, {maxAge: 900000, httpOnly: true});
                 let data = [];
                 let error = undefined;
                 try {
                     Course.find().then(courses => {
                         if (courses) {
                             data.push(...courses)
-                            res.render('home', { data, error, user })
+                            res.render('home', { data, error })
                         } else {
-                            res.render('home', { data, error: 'Lấy danh sách không thành công', user: req.user })
+                            res.render('home', { data, error: 'Lấy danh sách không thành công' })
                         }
                     })
                 } catch (error) {
-                    res.render('home', { data, error: 'Lấy danh sách không thành công', user: req.user })
+                    res.render('home', { data, error: 'Lấy danh sách không thành công' })
                 }
             } else {
                 res.render('login', { error: 'Đăng nhập không thành công' })

@@ -19,20 +19,29 @@ class CourseController {
     }
 
     async getCourseDetail(req, res, next) {
-        let data = {};
+        let data = [];
         let error = undefined;
         try {
-            Course.findOne({_id: req.body.courseId}).then(courses => {
+            await Course.findOne({_id: req.params.id}).then(courses => {
                 if (courses) {
-                    data  = courses;
-                    console.log("DATA: ", data.title !== undefined);
-                    res.render('detail', { data, user: req.user, error });
+                    data.push(courses);
+                    res.render('detail', { data, error });
                 } else {
-                    res.render('detail', { data, user: req.user, error: 'Lấy danh sách không thành công' })
+                    res.render('detail', { data, error: 'Lấy danh sách không thành công' })
                 }
             })
         } catch (error) {
-            res.render('detail', { data, user: req.user, error: 'Lấy danh sách không thành công' })
+            res.render('detail', { data, error: 'Lấy danh sách không thành công' })
+        }
+    }
+
+    async editCourse(req, res, next) {
+        let { title, titleDescription, status, type, amount, thumbnail } = req.body
+        try {
+            await Course.findByIdAndUpdate(req.body.courseId, { _id:req.body.courseId, title, titleDescription, status, type, amount, thumbnail })
+            res.redirect(`/course/${req.body.courseId}`);
+        } catch (error) {
+            res.render('detail', { error: 'Chỉnh sửa khóa học thất bại' })
         }
     }
 }
