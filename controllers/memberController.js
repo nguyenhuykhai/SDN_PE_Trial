@@ -5,10 +5,10 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken');
 
 class MemberController {
-    regis(req, res) {
+    async regis(req, res) {
         res.render('register', { message: 'Trang đăng ký' });
     }
-    handleRegis(req, res, next) {
+    async handleRegis(req, res, next) {
         const { username, password } = req.body;
         let error = undefined;
         if (!username || !password) {
@@ -22,7 +22,7 @@ class MemberController {
                 error, username, password
             });
         } else {
-            Members.findOne({ username: username }).then(user => {
+            await Members.findOne({ username: username }).then(user => {
                 if (user) {
                     error = 'Tài khoản đã tồn tại';
                     res.render('register', {
@@ -41,7 +41,7 @@ class MemberController {
                                 let data = [];
                                 let error = undefined;
                                 try {
-                                    Course.find().then(courses => {
+                                     Course.find().then(courses => {
                                         if (courses) {
                                             data.push(...courses)
                                             res.render('home', { data, error })
@@ -59,10 +59,10 @@ class MemberController {
             })
         }
     }
-    login(req, res) {
+    async login(req, res) {
         res.render('login', { message: 'Trang đăng nhập' });
     }
-    handleLogin(req, res, next) {
+    async handleLogin(req, res, next) {
         passport.authenticate('local', {
             failureRedirect: '/auth',
             failureFlash: true
@@ -74,33 +74,19 @@ class MemberController {
                 let user = { _id: req.user._id, username: req.user.username }
                 const token = jwt.sign({ _id: user.id, username: user.username }, 'SDN301m');
                 res.cookie('token', token, {maxAge: 900000, httpOnly: true});
-                let data = [];
-                let error = undefined;
-                try {
-                    Course.find().then(courses => {
-                        if (courses) {
-                            data.push(...courses)
-                            res.render('home', { data, error })
-                        } else {
-                            res.render('home', { data, error: 'Lấy danh sách không thành công' })
-                        }
-                    })
-                } catch (error) {
-                    res.render('home', { data, error: 'Lấy danh sách không thành công' })
-                }
+                res.redirect('/');
             } else {
                 res.render('login', { error: 'Đăng nhập không thành công' })
             }
         });
     }
-    signout(req, res, next) {
+    async signout(req, res, next) {
         req.logout(function (err) {
             if (err) { return next(err); }
             req.flash('success_msg', 'Đăng xuất thành công');
             res.render('/login', { message: 'Đăng xuất thành công' });
         })
     }
-
 }
 
 module.exports = new MemberController

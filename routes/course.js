@@ -19,4 +19,8 @@ courseRouter.post('/course/:id/edit', ensureAuthenticated, jwtDecode, async func
     courseControlle.editCourse(req, res, next);
 });
 
+courseRouter.get('/course/:id/delete', ensureAuthenticated, jwtDecode, async function (req, res, next) {
+    courseControlle.deleteCourse(req, res, next);
+});
+
 module.exports = courseRouter;

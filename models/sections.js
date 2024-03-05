@@ -6,7 +6,7 @@ const sectionSchema = new Schema({
     sectionDescription: { type: String, require: true },
     duration: { type: Number, require: true },
     isMainTask: { type: Boolean, default: false },
-    course: { type: mongoose.Schema.Types.ObjectId, ref: "Courses", require: true },
+    course: { type: moogoose.Schema.Types.ObjectId, ref: "courses", require: true },
 },
     { timestamps: true, });
 
