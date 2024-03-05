@@ -1,5 +1,6 @@
 const Course = require('../models/courses');
 const Sections = require('../models/sections')
+const mongoose = require('mongoose');
 
 class CourseController {
     async getAll(req, res, next) {
@@ -43,7 +44,7 @@ class CourseController {
         const objectId = new mongoose.Types.ObjectId(courseId)
         try {
             await Course.findByIdAndUpdate(courseId, { _id: objectId, courseName, courseDescription })
-            res.redirect(`/course/${courseId}`);
+            res.redirect(`/course/${courseId}?status=successfull`);
         } catch (error) {
             res.render('detail', { error: 'Chỉnh sửa khóa học thất bại' })
         }
@@ -52,6 +53,13 @@ class CourseController {
     async deleteCourse(req, res, next) {
         const sectionId = req.params.id;
         const objectId = new mongoose.Types.ObjectId(sectionId)
+        try {
+            await Course.findByIdAndDelete(sectionId)
+            await Sections.deleteMany({ course: objectId })
+            res.redirect(`/course?status=successfull`);
+        } catch (error) {
+            res.redirect(`/course?status=fail`);
+        }
     }
 
     async mappingSection(data) {

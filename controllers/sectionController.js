@@ -41,7 +41,7 @@ class SectionController {
             sectionId: new mongoose.Types.ObjectId(req.body.sectionId),
             sectionName: req.body.sectionName,
             sectionDescription: req.body.sectionDescription,
-            duration: new Number(req.body.duration),
+            duration: new Number(req.body.sectionDuration),
             isMainTask: new Boolean(req.body.isMainTask),
             course: req.body.course
         } 
@@ -50,7 +50,7 @@ class SectionController {
                 _id: convertObject.sectionId,
                 sectionName: convertObject.sectionName,
                 sectionDescription: convertObject.sectionDescription,
-                duration: convertObject.duration,
+                duration: convertObject.sectionDuration,
                 isMainTask: convertObject.isMainTask,
                 course: convertObject.course
             })

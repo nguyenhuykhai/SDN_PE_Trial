@@ -28,22 +28,27 @@
               <div class="card text-black">
                 <div class="card-body">
                         <p class="h1 text-uppercase">Chi tiết khóa học</p>
-                        <form action="/course/<%= data[0]._id %>/edit" method="POST">
-                            <input type="hidden" name="courseId" value="<%= data[0]._id %>" />
-                            <div class="mb-3">
-                                <label for="exampleFormControlInput1" class="h6 form-label fw-bold" style="float: inline-start">Tiêu đề khóa học</label>
-                                <input type="text" name="title" value="<%= data[0].courseName %>" class="form-control" id="exampleFormControlInput1">
-                              </div>
-                              <div class="mb-3">
-                                <label for="exampleFormControlInput1" class="h6 form-label fw-bold" style="float: inline-start">Mô tả</label>
-                                <input type="text" name="titleDescription" value="<%= data[0].courseDescription %>" class="form-control" id="exampleFormControlInput2">
-                              </div>
-                              <button type="submit" class="btn btn-outline-success">Chỉnh sửa khóa học</button>
-                              <a href="/course/<%= data[0]._id %>/delete" class="btn btn-outline-danger">Xóa khóa học</a>
+                        <form id="formCourse" action="/course/<%= data[0]._id %>/edit" method="POST">
+                          <input type="hidden" name="courseId" value="<%= data[0]._id %>" />
+                          <div class="mb-3">
+                            <label for="exampleFormControlInput1" class="h6 form-label fw-bold" style="float: inline-start">Tiêu đề khóa
+                              học</label>
+                            <input id="title" type="text" name="courseName" value="<%= data[0].courseName %>" class="form-control"
+                              id="exampleFormControlInput1">
+                            <div id="errorTitle"></div>
+                          </div>
+                          <div class="mb-3">
+                            <label for="exampleFormControlInput1" class="h6 form-label fw-bold" style="float: inline-start">Mô tả</label>
+                            <input id="titleDescription" type="text" name="courseDescription" value="<%= data[0].courseDescription %>"
+                              class="form-control" id="exampleFormControlInput2">
+                            <div id="errorTitleDescription"></div>
+                          </div>
+                          <button type="submit" id="submitBtn1" class="btn btn-outline-success">Chỉnh sửa khóa học</button>
+                          <a href="/course/<%= data[0]._id %>/delete" class="btn btn-outline-danger">Xóa khóa học</a>
                         </form>
                         <p class="h5 text-uppercase fw-bold mt-4">Danh sách section</p>
                         <% if(typeof data[0].sections !=='undefined' && data[0].sections.length> 0) { %>
-                          <% data[0].sections.forEach(function(item) { %>
+                          <% data[0].sections.forEach(function(item, index) { %>
                               <div class="accordion accordion-flush mt-1" id="accordionFlushExample<%= item._id %>">
                                 <div class="accordion-item">
                                   <h2 class="accordion-header">
@@ -58,35 +63,33 @@
                                   <div id="flush-collapseOne<%= item._id %>" class="accordion-collapse collapse"
                                     data-bs-parent="#accordionFlushExample<%= item._id %>">
                                     <div class="accordion-body">
-                                      <form action="/section/<%= item._id %>/edit" method="POST">
+                                      <form id="formSection<%= item._id %>" action="/section/<%= item._id %>/edit" method="POST">
                                         <input type="hidden" name="sectionId" value="<%= item._id %>" />
                                         <input type="hidden" name="course" value="<%= item.course %>" />
                                         <div>
-                                          <label for="exampleFormControlInput3" class="h6 form-label fw-bold" style="float: inline-start">Tiêu đề
-                                            section</label>
+                                          <label for="sectionName" class="h6 form-label fw-bold" style="float: inline-start">Tiêu đề section</label>
                                           <input type="text" name="sectionName" value="<%= item.sectionName %>" class="form-control pb-3"
-                                            id="exampleFormControlInput3" style="text-align: justify; text-justify: inter-word;">
+                                            id="sectionName<%= item._id %>" style="text-align: justify; text-justify: inter-word;">
+                                          <div id="errorSectionName<%= item._id %>"></div>
                                         </div>
                                         <div>
-                                          <label for="exampleFormControlInput4" class="h6 form-label fw-bold" style="float: inline-start">Mô
-                                            tả</label>
-                                          <textarea class="form-control" name="sectionDescription" id="exampleFormControlInput4" rows="3"
-                                            id="floatingTextarea"
-                                            style="text-align: justify; text-justify: inter-word;"><%= item.sectionDescription %></textarea>
+                                          <label for="sectionDescription" class="h6 form-label fw-bold" style="float: inline-start">Mô tả</label>
+                                          <textarea id="sectionDescription<%= item._id %>" class="form-control" name="sectionDescription" rows="3"
+                                            id="floatingTextarea" style="text-align: justify; text-justify: inter-word;"><%= item.sectionDescription %></textarea>
+                                          <div id="errorSectionDescription<%= item._id %>"></div>
                                         </div>
                                         <div>
-                                          <label for="exampleFormControlInput5" class="h6 form-label fw-bold" style="float: inline-start">Thời
+                                          <label for="sectionDuration" class="h6 form-label fw-bold" style="float: inline-start">Thời
                                             lượng</label>
-                                          <input type="number" name="duration" value="<%= item.duration %>" class="form-control pb-3"
-                                            id="exampleFormControlInput5">
+                                          <input type="number" name="sectionDuration" value="<%= item.duration %>" class="form-control pb-3" id="sectionDuration<%= item._id %>">
+                                          <div id="errorSectionDuration<%= item._id %>"></div>
                                         </div>
                                         <div class="form-check form-switch">
-                                          <input class="form-check-input h6" type="checkbox" role="switch" id="flexSwitchCheckChecked"
-                                            value="<%= item.isMainTask %>">
-                                          <label class="form-check-label h6" for="flexSwitchCheckChecked">Main task</label>
+                                          <input name="isMainTask" value="<%= item.isMainTask %>" class="form-check-input h6" type="checkbox" role="switch" id="isMainTask<%= index %>" <%= item.isMainTask ? 'checked' : '' %> />
+                                          <label class="form-check-label h6" for="isMainTask">Main task</label>
                                         </div>
                                         <div>
-                                          <button type="submit" class="btn btn-outline-success">Chỉnh sửa Section</button>
+                                          <button id="sectionBtn<%= item._id %>" type="submit" class="btn btn-outline-success">Chỉnh sửa Section</button>
                                           <a href="/section/<%= item._id %>/delete" class="btn btn-outline-danger">Xóa Section</a>
                                         </div>
                                       </form>
@@ -109,14 +112,74 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
     <script>
+      // Validate the form
+      // Check input must be text A-Z/a-z/0-9 and not empty
+      const titleInput = document.getElementById('title');
+      const titleDescriptionInput = document.getElementById('titleDescription');
+      const formCourse = document.getElementById('formCourse');
+      const submitBtn1 = document.getElementById('submitBtn1');
+      formCourse.addEventListener('submit', (e) => {
+        if (titleInput.value === '' || titleDescriptionInput.value === '' || !titleInput.value.match(/[^A-Za-z0-9]/) || !titleDescriptionInput.value.match(/[^A-Za-z0-9]/)){
+          e.preventDefault();
+          if (titleInput.value === '' || !titleInput.value.match(/[^A-Za-z0-9]/)) {
+            const errorTitle = document.getElementById('errorTitle');
+            errorTitle.innerHTML = `<p class="text-danger">Tiêu đề không hợp lệ</p>`;
+          }
+          if (titleDescriptionInput.value === '' || !titleDescriptionInput.value.match(/[^A-Za-z0-9]/)) {
+            const errorTitleDescription = document.getElementById('errorTitleDescription');
+            errorTitleDescription.innerHTML = `<p class="text-danger">Mô tả không hợp lệ</p>`;
+          }
+        }
+      });
+      
+      // Add event listeners to each switch input
+      <% data[0].sections.forEach((item, index) => { %>
+          const formSection<%= item._id %> = document.getElementById('formSection<%= item._id %>');
+          const sectionName<%= item._id %> = document.getElementById('sectionName<%= item._id %>');
+          const sectionDescription<%= item._id %> = document.getElementById('sectionDescription<%= item._id %>');
+          const sectionDuration<%= item._id %> = document.getElementById('sectionDuration<%= item._id %>');
+          formSection<%= item._id %>.addEventListener('submit', (e) => {
+            if ( sectionName<%= item._id %>.value === '' ||
+                 sectionDescription<%= item._id %>.value === '' ||
+                 sectionDuration<%= item._id %>.value <= 0 ||
+                 sectionDuration<%= item._id %>.value === '' ||
+                 !sectionName<%= item._id %>.value.match(/[^A-Za-z0-9]/) ||
+                 !sectionDescription<%= item._id %>.value.match(/[^A-Za-z0-9]/)) {
+                e.preventDefault();
+                if (sectionName<%= item._id %>.value === '' || !sectionName<%= item._id %>.value.match(/[^A-Za-z0-9]/)) {
+                  const errorSectionName<%= item._id %> = document.getElementById('errorSectionName<%= item._id %>');
+                  errorSectionName<%= item._id %>.innerHTML = `<p class="text-danger">Tiêu đề section không hợp lệ</p>`;
+                }
+                if (sectionDescription<%= item._id %>.value === '' || !sectionDescription<%= item._id %>.value.match(/[^A-Za-z0-9]/)) {
+                  const errorSectionDescription<%= item._id %> = document.getElementById('errorSectionDescription<%= item._id %>');
+                  errorSectionDescription<%= item._id %>.innerHTML = `<p class="text-danger">Mô tả section không hợp lệ</p>`;
+                }
+                if (sectionDuration<%= item._id %>.value === '' || sectionDuration<%= item._id %>.value <= 0) {
+                  const errorSectionDuration<%= item._id %> = document.getElementById('errorSectionDuration<%= item._id %>');
+                  errorSectionDuration<%= item._id %>.innerHTML = `<p class="text-danger">Thời lượng không hợp lệ</p>`;
+                }
+            }
+          });
+            const isMainTask<%= index %> = document.getElementById('isMainTask<%= index %>');
+            isMainTask<%= index %>.addEventListener('change', function() {
+            isMainTask<%= index %>.value = this.checked.toString(); // Update the value of the hidden input
+          });
+      <% }); %>
+
+
       // Extracting the status parameter from the URL
+      const url = window.location.href;
       const urlParams = new URLSearchParams(window.location.search);
+      const strs = url.split('/');
+      const temp = strs.at(-1);
+      const strs2 = temp.split('?');
+      const courseId = strs2.at(0)
       const status = urlParams.get('status');
       const toastElement = document.getElementById('toast');
 
       if (toastElement) {
         toastElement.addEventListener('click', () => {
-          window.history.replaceState({}, document.title, 'http://localhost:5000/course/64916b697f8a6ac6119055fc');
+          window.history.replaceState({}, document.title, `http://localhost:5000/course/${courseId}`);
         })
       }
 
@@ -129,7 +192,7 @@
                   <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
                     <div class="toast-header text-bg-success">
                       <strong class="me-auto text-white">Thông báo</strong>
-                      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                      <button type="button" id="closeBtn" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
                     </div>
                     <div class="toast-body">
                       Thực hiện thành công
@@ -139,17 +202,21 @@
               `;
               // Set the HTML content of the toast element
               toastElement.innerHTML = htmlContent;
-          } else {
+          }
+          if (status === 'fail') {
               // If status is 'successfull', create the HTML content for the toast
               const htmlContent = `
-                  <div class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" style=" top: 10% !important; left: 1% !important; position: absolute; z-index: 10;">
-                      <div class="d-flex">
-                          <div class="toast-body">
-                              Thực hiện thất bại
-                          </div>
-                          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                      </div>
+                <div class="toast-container position-fixed top-0 end-0 p-3">
+                  <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header text-bg-danger">
+                      <strong class="me-auto text-white">Thông báo</strong>
+                      <button type="button" id="closeBtn" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                      Thực hiện thất bại
+                    </div>
                   </div>
+                </div>
               `;
               // Set the HTML content of the toast element
               toastElement.innerHTML = htmlContent;
