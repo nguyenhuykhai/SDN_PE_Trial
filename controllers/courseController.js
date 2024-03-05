@@ -65,7 +65,7 @@ class CourseController {
                 return data;
             }   
         } catch(error) {
-            console.log('Mapping Sections: Error // ', error);
+            console.log('Mapping Sections: Error // Detail: ', error);
             return data;
         }
     }

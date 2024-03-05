@@ -42,12 +42,13 @@
                           <form action="/course/<%= data[0]._id %>/delete" method="POST">
                             <button type="submit" class="btn btn-outline-danger">Xóa khóa học</button>
                             <input type="hidden" name="courseId" value="<%= data[0]._id %>"/>
-                        </form>
+                          </form>
                         </div>
                         <p class="h5 text-uppercase fw-bold mt-4">Danh sách section</p>
                         <% if(typeof data[0].sections !=='undefined' && data[0].sections.length> 0) { %>
                           <% data[0].sections.forEach(function(item) { %>
-                            <form>
+                            <form action="/section/<%= item._id %>/edit" method="POST">
+                              <input type="hidden" name="sectionId" value="item._id"/>
                               <div class="accordion accordion-flush mt-1" id="accordionFlushExample<%= item._id %>">
                                 <div class="accordion-item">
                                   <h2 class="accordion-header">
@@ -79,10 +80,17 @@
                                           value="<%= item.isMainTask %>">
                                         <label class="form-check-label h6" for="flexSwitchCheckChecked">Main task</label>
                                       </div>
+                                      <div>
+                                        <button type="submit" class="btn btn-outline-success">Chỉnh sửa Section</button>
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
                               </div>
+                            </form>
+                            <form action="/section/<%= item._id %>/delete" method="POST">
+                              <button type="submit" class="btn btn-outline-danger">Xóa Section</button>
+                              <input type="hidden" name="sectionId" value="item._id"/>
                             </form>
                           <% }) %>
                         <% } %>
