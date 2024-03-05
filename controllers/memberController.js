@@ -74,7 +74,7 @@ class MemberController {
                 let user = { _id: req.user._id, username: req.user.username }
                 const token = jwt.sign({ _id: user.id, username: user.username }, 'SDN301m');
                 res.cookie('token', token, {maxAge: 900000, httpOnly: true});
-                res.redirect('/');
+                res.redirect('/course');
             } else {
                 res.render('login', { error: 'Đăng nhập không thành công' })
             }

@@ -15,11 +15,11 @@ sectionRouter.use(bodyParser.urlencoded({ extended: true }));
 //     courseControlle.getCourseDetail(req, res, next);
 // });
 
-sectionRouter.post('/section/:id/edit', ensureAuthenticated, jwtDecode, async function (req, res, next) {
+sectionRouter.post('/:id/edit', ensureAuthenticated, jwtDecode, async function (req, res, next) {
     sectionController.editSection(req, res, next);
 });
 
-sectionRouter.get('/section/:id/delete', ensureAuthenticated, jwtDecode, async function (req, res, next) {
+sectionRouter.get('/:id/delete', ensureAuthenticated, jwtDecode, async function (req, res, next) {
     sectionController.deleteSection(req, res, next);
 });
 

@@ -11,15 +11,15 @@ courseRouter.get('/', ensureAuthenticated, jwtDecode, async function (req, res, 
     courseController.getAll(req, res, next);
 });
 
-courseRouter.get('/course/:id', ensureAuthenticated, jwtDecode, async function (req, res, next) {
+courseRouter.get('/:id', ensureAuthenticated, jwtDecode, async function (req, res, next) {
     courseController.getCourseDetail(req, res, next);
 });
 
-courseRouter.post('/course/:id/edit', ensureAuthenticated, jwtDecode, async function (req, res, next) {
+courseRouter.post('/:id/edit', ensureAuthenticated, jwtDecode, async function (req, res, next) {
     courseController.editCourse(req, res, next);
 });
 
-courseRouter.get('/course/:id/delete', ensureAuthenticated, jwtDecode, async function (req, res, next) {
+courseRouter.get('/:id/delete', ensureAuthenticated, jwtDecode, async function (req, res, next) {
     courseController.deleteCourse(req, res, next);
 });
 

@@ -40,8 +40,9 @@ class CourseController {
 
     async editCourse(req, res, next) {
         let { courseId, courseName, courseDescription } = req.body
+        const objectId = new mongoose.Types.ObjectId(courseId)
         try {
-            await Course.findByIdAndUpdate(courseId, { _id: courseId, courseName, courseDescription })
+            await Course.findByIdAndUpdate(courseId, { _id: objectId, courseName, courseDescription })
             res.redirect(`/course/${courseId}`);
         } catch (error) {
             res.render('detail', { error: 'Chỉnh sửa khóa học thất bại' })
@@ -49,7 +50,8 @@ class CourseController {
     }
 
     async deleteCourse(req, res, next) {
-        
+        const sectionId = req.params.id;
+        const objectId = new mongoose.Types.ObjectId(sectionId)
     }
 
     async mappingSection(data) {
