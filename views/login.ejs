@@ -22,11 +22,11 @@
             
             <!-- Hiển thị message gửi từ phía Server -->
             <% if(typeof message !== 'undefined' && message !== undefined) { %>
-              <h1><%= message %></h1>
+              <h3><%= message %></h3>
             <% } %>
 
             <% if(typeof error !== 'undefined' && error !== undefined) { %>
-              <h1><%= error %></h1>
+              <h3><%= error %></h3>
             <% } %>
 
             <form action="/auth" method="POST">

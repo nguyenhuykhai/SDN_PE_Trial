@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Create Course Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+
+<body>
+    <!-- Include file header.ejs -->
+    <%- include('header') -%>
+
+    <section style="background-color: #eee;">
+        <div class="container py-5">
+            <!-- Display toast if url have params status -->
+            <div id="toast"></div>
+
+            <div class="card text-black">
+                <div class="card-body">
+                    <p class="h1 text-uppercase">Chi tiết khóa học</p>
+                    <form id="formCourse" action="/course" method="POST">
+                        <div class="mb-3">
+                            <label for="courseName" class="h6 form-label fw-bold" style="float: inline-start">Tiêu đề khóa học</label>
+                            <input type="text" id="courseName" name="courseName" value="" class="form-control">
+                            <div id="errorCourseName"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="courseDescription" class="h6 form-label fw-bold" style="float: inline-start">Mô
+                                tả</label>
+                            <input type="text" id="courseDescription" name="courseDescription" value="" class="form-control">
+                            <div id="errorCourseDescription"></div>
+                        </div>
+                        <button type="submit" id="submitBtn1" class="btn btn-outline-primary">Tạo khóa học</button>
+                        <button type="reset" class="btn btn-outline-primary">Làm mới</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+    <script>
+      // ------------------------------------VALIDATE FORM COURSE------------------------------------
+      // Check input must be text A-Z/a-z/0-9 and not empty
+      const titleInput = document.getElementById('courseName');
+      const titleDescriptionInput = document.getElementById('courseDescription');
+      const formCourse = document.getElementById('formCourse');
+      formCourse.addEventListener('submit', (e) => {
+        if (titleInput.value === '' || titleDescriptionInput.value === '' || !titleInput.value.match(/[^A-Za-z0-9]/) || !titleDescriptionInput.value.match(/[^A-Za-z0-9]/)){
+          e.preventDefault();
+          if (titleInput.value === '' || !titleInput.value.match(/[^A-Za-z0-9]/)) {
+            const errorCourseName = document.getElementById('errorCourseName');
+            errorCourseName.innerHTML = `<p class="text-danger">Tiêu đề không hợp lệ</p>`;
+          } else {
+            const errorCourseName = document.getElementById('errorCourseName');
+            errorCourseName.innerHTML = '';
+          }
+          if (titleDescriptionInput.value === '' || !titleDescriptionInput.value.match(/[^A-Za-z0-9]/)) {
+            const errorCourseDescription = document.getElementById('errorCourseDescription');
+            errorCourseDescription.innerHTML = `<p class="text-danger">Mô tả không hợp lệ</p>`;
+          } else {
+            const errorCourseDescription = document.getElementById('errorCourseDescription');
+            errorCourseDescription.innerHTML = '';
+          }
+        }
+      });
+
+      // ------------------------------------DISPLAY TOAST------------------------------------
+      // Extracting the status parameter from the URL
+      const url = window.location.href;
+      const urlParams = new URLSearchParams(window.location.search);
+      const strs = url.split('/');
+      const temp = strs.at(-1);
+      const strs2 = temp.split('?');
+      const courseId = strs2.at(0)
+      const status = urlParams.get('status');
+      const toastElement = document.getElementById('toast');
+
+      if (toastElement) {
+        toastElement.addEventListener('click', () => {
+          window.history.replaceState({}, document.title, `http://localhost:5000/course/${courseId}`);
+        })
+      }
+
+      // Now you can use the 'status' variable in your template logic
+      if (status !== null) {
+          if (status === 'successfull') {
+              // If status is 'successfull', create the HTML content for the toast
+              const htmlContent = `
+                <div class="toast-container position-fixed top-0 end-0 p-3">
+                  <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header text-bg-success">
+                      <strong class="me-auto text-white">Thông báo</strong>
+                      <button type="button" id="closeBtn" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                      Thực hiện thành công
+                    </div>
+                  </div>
+                </div>
+              `;
+              // Set the HTML content of the toast element
+              toastElement.innerHTML = htmlContent;
+          }
+          if (status === 'fail') {
+              // If status is 'successfull', create the HTML content for the toast
+              const htmlContent = `
+                <div class="toast-container position-fixed top-0 end-0 p-3">
+                  <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header text-bg-danger">
+                      <strong class="me-auto text-white">Thông báo</strong>
+                      <button type="button" id="closeBtn" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                      Thực hiện thất bại
+                    </div>
+                  </div>
+                </div>
+              `;
+              // Set the HTML content of the toast element
+              toastElement.innerHTML = htmlContent;
+          }
+      }
+    </script>
+  </body>
+</html>

@@ -51,14 +51,25 @@ class CourseController {
     }
 
     async deleteCourse(req, res, next) {
-        const sectionId = req.params.id;
-        const objectId = new mongoose.Types.ObjectId(sectionId)
+        const courseId = req.params.id;
+        const objectId = new mongoose.Types.ObjectId(courseId)
         try {
-            await Course.findByIdAndDelete(sectionId)
+            await Course.findByIdAndDelete(courseId)
             await Sections.deleteMany({ course: objectId })
             res.redirect(`/course?status=successfull`);
         } catch (error) {
             res.redirect(`/course?status=fail`);
+        }
+    }
+
+    async createCourse(req, res, next) {
+        let { courseName, courseDescription } = req.body
+        const newCourse = new Course({ courseName, courseDescription })
+        try {
+            await newCourse.save()
+            res.redirect('/course/create?status=successfull');
+        } catch (error) {
+            res.redirect('/course/create?status=fail');
         }
     }
 

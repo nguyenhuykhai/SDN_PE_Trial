@@ -62,7 +62,7 @@ class MemberController {
     async login(req, res) {
         res.render('login', { message: 'Trang đăng nhập' });
     }
-    async handleLogin(req, res, next) {
+    async handleLogin(req, res) {
         passport.authenticate('local', {
             failureRedirect: '/auth',
             failureFlash: true
@@ -83,8 +83,7 @@ class MemberController {
     async signout(req, res, next) {
         req.logout(function (err) {
             if (err) { return next(err); }
-            req.flash('success_msg', 'Đăng xuất thành công');
-            res.render('/login', { message: 'Đăng xuất thành công' });
+            res.render('login', { message: 'Đăng xuất thành công' });
         })
     }
 }

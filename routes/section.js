@@ -11,9 +11,9 @@ sectionRouter.use(bodyParser.urlencoded({ extended: true }));
 //     courseControlle.getAll(req, res, next);
 // });
 
-// sectionRouter.get('/course/:id', ensureAuthenticated, jwtDecode, async function (req, res, next) {
-//     courseControlle.getCourseDetail(req, res, next);
-// });
+sectionRouter.post('/', ensureAuthenticated, jwtDecode, async function (req, res, next) {
+    sectionController.createSection(req, res, next);
+});
 
 sectionRouter.post('/:id/edit', ensureAuthenticated, jwtDecode, async function (req, res, next) {
     sectionController.editSection(req, res, next);

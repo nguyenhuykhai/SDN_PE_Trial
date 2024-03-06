@@ -11,6 +11,14 @@ courseRouter.get('/', ensureAuthenticated, jwtDecode, async function (req, res, 
     courseController.getAll(req, res, next);
 });
 
+courseRouter.post('/', ensureAuthenticated, jwtDecode, async function (req, res, next) {
+    courseController.createCourse(req, res, next);
+})
+
+courseRouter.get('/create', ensureAuthenticated, jwtDecode, async function (req, res, next) {
+    res.render('createCourse');
+})
+
 courseRouter.get('/:id', ensureAuthenticated, jwtDecode, async function (req, res, next) {
     courseController.getCourseDetail(req, res, next);
 });

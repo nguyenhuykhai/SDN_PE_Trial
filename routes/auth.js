@@ -12,7 +12,7 @@ authRouter.get('/register', async function (req, res, next) {
 
 // Xử lý đăng ký
 authRouter.post('/register', async function (req, res, next) {
-  memberController.handleRegis(req, res)
+  memberController.handleRegis(req, res, next)
 });
 
 // Chuyển tới trang đăng nhập
@@ -24,5 +24,10 @@ authRouter.get('/', async function (req, res, next) {
 authRouter.post('/', async function(req, res, next) {
   memberController.handleLogin(req, res)
 });
+
+// Xử lý đăng xuất
+authRouter.get('/logout', async function(req, res, next) {
+  memberController.signout(req, res, next)
+})
 
 module.exports = authRouter;

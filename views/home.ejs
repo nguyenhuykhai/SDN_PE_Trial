@@ -12,13 +12,10 @@
     <%- include('header') -%>
         <section style="background-color: #eee;">
             <div class="container py-5">
-                <!-- Hiển thị message gửi từ phía Server -->
-                <% if(typeof message !== 'undefined' && message !== undefined) { %>
-                    <h1><%= message %></h1>
-                <% } %>
-                <% if(typeof error !== 'undefined' && error !== undefined) { %>
-                    <h1><%= error %></h1>
-                <% } %>
+
+                <!-- Display toast if url have params status -->
+                <div id="toast"></div>
+
                 <div class="row">
                     <% if(typeof data !=='undefined' && data.length > 0) { %>
                         <% data.forEach(function(item) { %>
@@ -47,7 +44,7 @@
                                                               <p class="h6 mb-2" style="text-align: justify; text-justify: inter-word;"><strong>Mô tả:</strong> <%= item.sectionDescription %></p>
                                                               <p class="h6 mb-2"><strong>Thời lượng:</strong> <%= item.duration %></p>
                                                               <div class="form-check form-switch">
-                                                                <input class="form-check-input h6" type="checkbox" role="switch" id="flexSwitchCheckChecked" value="<%= item.isMainTask %>">
+                                                                <input class="form-check-input h6" type="checkbox" role="switch" id="flexSwitchCheckChecked" <%= item.isMainTask ? 'checked' : '' %> disabled />
                                                                 <label class="form-check-label h6" for="flexSwitchCheckChecked">Main task</label>
                                                               </div>
                                                             </div>
@@ -70,5 +67,63 @@
         </section>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
-</body>
+        <script>
+        // ------------------------------------DISPLAY TOAST------------------------------------
+        // Extracting the status parameter from the URL
+        const url = window.location.href;
+        const urlParams = new URLSearchParams(window.location.search);
+        const strs = url.split('/');
+        const temp = strs.at(-1);
+        const strs2 = temp.split('?');
+        const courseId = strs2.at(0)
+        const status = urlParams.get('status');
+        const toastElement = document.getElementById('toast');
+
+        if (toastElement) {
+          toastElement.addEventListener('click', () => {
+            window.history.replaceState({}, document.title, `http://localhost:5000/course/${courseId}`);
+          })
+        }
+
+        // Now you can use the 'status' variable in your template logic
+        if (status !== null) {
+            if (status === 'successfull') {
+                // If status is 'successfull', create the HTML content for the toast
+                const htmlContent = `
+                  <div class="toast-container position-fixed top-0 end-0 p-3">
+                    <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                      <div class="toast-header text-bg-success">
+                        <strong class="me-auto text-white">Thông báo</strong>
+                        <button type="button" id="closeBtn" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                      </div>
+                      <div class="toast-body">
+                        Thực hiện thành công
+                      </div>
+                    </div>
+                  </div>
+                `;
+                // Set the HTML content of the toast element
+                toastElement.innerHTML = htmlContent;
+            }
+            if (status === 'fail') {
+                // If status is 'successfull', create the HTML content for the toast
+                const htmlContent = `
+                  <div class="toast-container position-fixed top-0 end-0 p-3">
+                    <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                      <div class="toast-header text-bg-danger">
+                        <strong class="me-auto text-white">Thông báo</strong>
+                        <button type="button" id="closeBtn" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                      </div>
+                      <div class="toast-body">
+                        Thực hiện thất bại
+                      </div>
+                    </div>
+                  </div>
+                `;
+                // Set the HTML content of the toast element
+                toastElement.innerHTML = htmlContent;
+            }
+        }
+        </script>
+    </body>
 </html>
