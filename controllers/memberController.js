@@ -86,6 +86,32 @@ class MemberController {
             res.render('login', { message: 'Đăng xuất thành công' });
         })
     }
+
+    // Xử lý Authenticate với POSTMAN
+    async handleApiLogin(req, res, next) {
+        passport.authenticate('local', {
+            failureFlash: true
+        })(req, res, async function(err) {
+            if (err) {
+                res.status(400).json({ error: 'Đăng nhập không thành công' })
+            }
+            if (req.user) {
+                let user = { _id: req.user._id, username: req.user.username }
+                const token = jwt.sign({ _id: user.id, username: user.username }, 'SDN301m');
+                res.cookie('token', token, {maxAge: 900000, httpOnly: true});
+                res.status(200).json({ user, token });
+            } else {
+                res.status(400).json({ error: 'Đăng nhập không thành công' })
+            }
+        }); 
+    }
+
+    async handleApiSignout(req, res, next) {
+        req.logout(function (err) {
+            if (err) { return next(err); }
+            res.status(200).json({ message: 'Đăng xuất thành công' });
+        })
+    }
 }
 
 module.exports = new MemberController
