@@ -1,33 +1,28 @@
 const Members = require('../models/members')
 const Course = require('../models/courses')
 const bcrypt = require('bcrypt')
-const passport = require('passport');
 const jwt = require('jsonwebtoken');
+const Joi = require('joi') 
 
 class MemberController {
     async regis(req, res) {
-        res.render('register', { message: 'Trang đăng ký' });
+        res.render('register', { message: 'Register Page' });
     }
     async handleRegis(req, res, next) {
         const { username, password } = req.body;
-        let error = undefined;
-        if (!username || !password) {
-            error = 'Nhập toàn bộ field';
-        }
-        if (password.length < 6) {
-            error = 'Password ít nhất 6 ký tự';
-        }
-        if (error !== undefined) {
-            res.render('register', {
-                error, username, password
-            });
+        const JoiSchema = Joi.object({
+            username: Joi.string().required(),
+            password: Joi.string().required().min(6)
+        }).options({ abortEarly: false });
+
+        const { error } = JoiSchema.validate({ username, password });
+
+        if (error) {
+            res.render('register', { error: 'Username or password invalid', username, password });
         } else {
             await Members.findOne({ username: username }).then(user => {
                 if (user) {
-                    error = 'Tài khoản đã tồn tại';
-                    res.render('register', {
-                        error, username, password
-                    });
+                    res.render('register', { error: 'Account already exists', username, password });
                 } else {
                     const newMember = new Members({ username, password })
                     //Hash password
@@ -38,20 +33,7 @@ class MemberController {
                             .then(user => {
                                 const token = jwt.sign({ _id: user.id, username: user.username }, 'SDN301m', { expiresIn: '1h' });
                                 res.cookie('token', token, {maxAge: 900000, httpOnly: true});
-                                let data = [];
-                                let error = undefined;
-                                try {
-                                     Course.find().then(courses => {
-                                        if (courses) {
-                                            data.push(...courses)
-                                            res.render('home', { data, error })
-                                        } else {
-                                            res.render('home', { data, error: 'Lấy danh sách không thành công' })
-                                        }
-                                    })
-                                } catch (error) {
-                                    res.render('home', { data, error: 'Lấy danh sách không thành công' })
-                                }
+                                res.redirect('/course');
                             })
                             .catch(next);
                     })
@@ -124,6 +106,40 @@ class MemberController {
             })
         } catch (error) {
             res.status(400).json({ error: 'Incorrect password' })
+        }
+    }
+
+    // Handle API resigter
+    async handleApiRegis(req, res, next) {
+        const { username, password } = req.body;
+        const JoiSchema = Joi.object({
+            username: Joi.string().required(),
+            password: Joi.string().required().min(6)
+        }).options({ abortEarly: false });
+
+        const { error } = JoiSchema.validate({ username, password });
+
+        if (error) {
+            res.status(400).json({ error: 'Username or password invalid' });
+        } else {
+            await Members.findOne({ username: username }).then(user => {
+                if (user) {
+                    res.status(400).json({ error: 'Account already exists' });
+                } else {
+                    const newMember = new Members({ username, password })
+                    //Hash password
+                    bcrypt.hash(newMember.password, 10, function (err, hash) {
+                        if (err) throw err;
+                        newMember.password = hash;
+                        newMember.save()
+                            .then(user => {
+                                const token = jwt.sign({ _id: user.id, username: user.username }, 'SDN301m', { expiresIn: '1h' });
+                                res.status(200).json({ id: user.id, username: user.username, token });
+                            })
+                            .catch(next);
+                    })
+                }
+            })
         }
     }
 

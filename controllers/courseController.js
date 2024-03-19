@@ -211,8 +211,7 @@ class CourseController {
             console.log('Mapping Sections: Error // Detail: ', error);
             return data;
         }
-    }
-    
+    }   
 }
 
 module.exports = new CourseController

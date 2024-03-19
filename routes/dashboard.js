@@ -15,6 +15,10 @@ dashboardRouter.post('/', jwtDecode, async function (req, res, next) {
     dashboardController.createItem(req, res, next);
 })
 
+dashboardRouter.post('/search', async function (req, res, next) {
+    dashboardController.searchItem(req, res, next);
+})
+
 dashboardRouter.get('/create', jwtDecode, async function (req, res, next) {
     res.render('dashboardForm');
 })

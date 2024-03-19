@@ -90,6 +90,22 @@ class DashboardController {
             res.redirect(`/course?status=fail`);
         }
     }
+
+    async searchItem(req, res, next) {
+        const { search } = req.body;
+        console.log('Search', search);
+        try {
+            await Course.find({ courseName: { $regex: search, $options: 'i' } }).then(async items => {
+                if (items) {
+                    res.render('dashboard', { data: items });
+                } else {
+                    res.redirect('/dashboard');
+                }
+            })
+        } catch (error) {
+            res.redirect('/dashboard');
+        }
+    }
 }
 
 module.exports = new DashboardController

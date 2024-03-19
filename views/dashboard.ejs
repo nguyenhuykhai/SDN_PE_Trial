@@ -15,9 +15,16 @@
     <%- include('header') -%>
         <section>
             <div class="container">
+                <div class="d-flex flex-row-reverse py-3">
+                    <!-- Search form -->
+                    <form action="/dashboard/search" method="POST">
+                        <input class="form-control me-2" name="search" type="search" placeholder="Search" aria-label="Search">
+                        <button class="btn btn-outline-success" type="submit">Search</button>
+                    </form>
+                </div>
                 <% if(typeof data !=='undefined' && data.length > 0) { %>
-                        <table class="table">
-                            <thead>
+                        <table class="table table-bordered">
+                            <thead class="table-light">
                                 <tr>
                                     <th scope="col">ID</th>
                                     <th scope="col">Name</th>
@@ -26,11 +33,11 @@
                                     <th scope="col"></th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="table-group-divider">
                                 <% data.forEach(function(item, index) { %>
                                 <tr>
                                     <th scope="row">
-                                        <%= index %>
+                                        <%= index + 1 %>
                                         <input type="hidden" name="id" value="<%= item._id %>"/>
                                     </th>
                                     <td><%= item.courseName %></td>
