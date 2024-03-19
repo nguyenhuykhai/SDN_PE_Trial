@@ -17,27 +17,27 @@
 
             <div id="toast"></div>
 
-            <% if(typeof data !=='undefined' && data.length> 0) { %>
+            <% if(typeof data !=='undefined') { %>
               <div class="card text-black">
                 <div class="card-body">
                         <p class="h1 text-uppercase">Chi tiết khóa học</p>
-                        <form id="formCourse" action="/course/<%= data[0]._id %>/edit" method="POST">
-                          <input type="hidden" name="courseId" value="<%= data[0]._id %>" />
+                        <form id="formCourse" action="/course/<%= data._id %>/edit" method="POST">
+                          <input type="hidden" name="courseId" value="<%= data._id %>" />
                           <div class="mb-3">
                             <label for="exampleFormControlInput1" class="h6 form-label fw-bold" style="float: inline-start">Tiêu đề khóa
                               học</label>
-                            <input id="title" type="text" name="courseName" value="<%= data[0].courseName %>" class="form-control"
+                            <input id="title" type="text" name="courseName" value="<%= data.courseName %>" class="form-control"
                               id="exampleFormControlInput1">
                             <div id="errorTitle"></div>
                           </div>
                           <div class="mb-3">
                             <label for="exampleFormControlInput1" class="h6 form-label fw-bold" style="float: inline-start">Mô tả</label>
-                            <input id="titleDescription" type="text" name="courseDescription" value="<%= data[0].courseDescription %>"
+                            <input id="titleDescription" type="text" name="courseDescription" value="<%= data.courseDescription %>"
                               class="form-control" id="exampleFormControlInput2">
                             <div id="errorTitleDescription"></div>
                           </div>
                           <button type="submit" id="submitBtn1" class="btn btn-outline-primary">Chỉnh sửa khóa học</button>
-                          <a href="/course/<%= data[0]._id %>/delete" class="btn btn-outline-danger">Xóa khóa học</a>
+                          <a href="/course/<%= data._id %>/delete" class="btn btn-outline-danger">Xóa khóa học</a>
                         </form>
 
                         <div class="container text-start mt-2">
@@ -52,8 +52,8 @@
                             </div>
                           </div>
                         </div>
-                        <% if(typeof data[0].sections !=='undefined' && data[0].sections.length> 0) { %>
-                          <% data[0].sections.forEach(function(item, index) { %>
+                        <% if(typeof data.sections !=='undefined' && data.sections.length> 0) { %>
+                          <% data.sections.forEach(function(item, index) { %>
                               <div class="accordion accordion-flush mt-1" id="accordionFlushExample<%= item._id %>">
                                 <div class="accordion-item">
                                   <h2 class="accordion-header">
@@ -124,7 +124,7 @@
                   </div>
                   <form id="formSection" action="/section" method="POST">
                   <div class="modal-body">
-                    <input type="hidden" name="course" value="<%= data[0]._id %>" />
+                    <input type="hidden" name="course" value="<%= data._id %>" />
                     <div>
                       <label for="sectionName" class="h6 form-label fw-bold" style="float: inline-start">Tiêu đề section</label>
                       <input type="text" id="sectionName" name="sectionName" value="" class="form-control pb-3"
@@ -189,7 +189,7 @@
       
       // ------------------------------------VALIDATE FORM UPDATE SECTION------------------------------------
       // Add event listeners to each switch input
-      <% data[0].sections.forEach((item, index) => { %>
+      <% data.sections.forEach((item, index) => { %>
           const formSection<%= item._id %> = document.getElementById('formSection<%= item._id %>');
           const sectionName<%= item._id %> = document.getElementById('sectionName<%= item._id %>');
           const sectionDescription<%= item._id %> = document.getElementById('sectionDescription<%= item._id %>');
@@ -273,64 +273,6 @@
           isMainTaskModal.addEventListener('change', function() {
             isMainTask.value = this.checked.toString();
           })
-
-      // ------------------------------------DISPLAY TOAST------------------------------------
-      // Extracting the status parameter from the URL
-      const url = window.location.href;
-      const urlParams = new URLSearchParams(window.location.search);
-      const strs = url.split('/');
-      const temp = strs.at(-1);
-      const strs2 = temp.split('?');
-      const courseId = strs2.at(0)
-      const status = urlParams.get('status');
-      const toastElement = document.getElementById('toast');
-
-      if (toastElement) {
-        toastElement.addEventListener('click', () => {
-          window.history.replaceState({}, document.title, `http://localhost:5000/course/${courseId}`);
-        })
-      }
-
-      // Now you can use the 'status' variable in your template logic
-      if (status !== null) {
-          if (status === 'successfull') {
-              // If status is 'successfull', create the HTML content for the toast
-              const htmlContent = `
-                <div class="toast-container position-fixed top-0 end-0 p-3">
-                  <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
-                    <div class="toast-header text-bg-success">
-                      <strong class="me-auto text-white">Thông báo</strong>
-                      <button type="button" id="closeBtn" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                    </div>
-                    <div class="toast-body">
-                      Thực hiện thành công
-                    </div>
-                  </div>
-                </div>
-              `;
-              // Set the HTML content of the toast element
-              toastElement.innerHTML = htmlContent;
-          }
-          if (status === 'fail') {
-              // If status is 'successfull', create the HTML content for the toast
-              const htmlContent = `
-                <div class="toast-container position-fixed top-0 end-0 p-3">
-                  <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
-                    <div class="toast-header text-bg-danger">
-                      <strong class="me-auto text-white">Thông báo</strong>
-                      <button type="button" id="closeBtn" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                    </div>
-                    <div class="toast-body">
-                      Thực hiện thất bại
-                    </div>
-                  </div>
-                </div>
-              `;
-              // Set the HTML content of the toast element
-              toastElement.innerHTML = htmlContent;
-          }
-        
-      }
     </script>
   </body>
 </html>

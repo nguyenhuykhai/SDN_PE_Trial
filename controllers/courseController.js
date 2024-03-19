@@ -7,37 +7,35 @@ class CourseController {
     // Handle course and render view
     async getAll(req, res, next) {
         let data = [];
-        let error = undefined;
         try {
             await Course.find().then(async courses => {
                 if (courses) {
                     data.push(...courses)
                     data = await this.mappingSection(data);
-                    res.render('home', { data, error });
+                    res.render('home', { data });
                 } else {
-                    res.render('home', { data, error: 'Lấy danh sách không thành công' })
+                    res.render('home', { data })
                 }
             })
         } catch (error) {
-            res.render('home', { data, error: 'Lấy danh sách không thành công' })
+            res.render('home', { data })
         }
     }
 
     async getCourseDetail(req, res, next) {
         let data = [];
-        let error = undefined;
         try {
             await Course.findOne({_id: req.params.id}).then(async courses => {
                 if (courses) {
                     data.push(courses);
                     data = await this.mappingSection(data);
-                    res.render('detail', { data, error });
+                    res.render('detail', { data: data[0] });
                 } else {
-                    res.render('detail', { data, error: 'Lấy danh sách không thành công' })
+                    res.redirect('/course?status=fail');
                 }
             })
         } catch (error) {
-            res.render('detail', { data, error: 'Lấy danh sách không thành công' })
+            res.redirect('/course?status=fail');
         }
     }
 
@@ -45,7 +43,7 @@ class CourseController {
         let { courseId, courseName, courseDescription } = req.body
         const JoiSchema = Joi.object({
             courseId: Joi.string().required(),
-            courseName: Joi.string().regex(/^A-Za-z0-9_./).required(), 
+            courseName: Joi.string().regex(/[^A-Za-z0-9]/).required(), 
             courseDescription: Joi.string().required()
           }).options({ abortEarly: false });
         
@@ -53,40 +51,40 @@ class CourseController {
 
         if (error) {
             res.redirect('/course/create?status=fail');
-        }
-
-        const newCourse = new Course({ courseName, courseDescription })
-        try {
-            await newCourse.save()
-            res.redirect('/course/create?status=successfull');
-        } catch (error) {
-            res.redirect('/course/create?status=fail');
+        } else {
+            const newCourse = new Course({ courseName, courseDescription })
+            try {
+                await newCourse.save()
+                res.redirect('/course/create?status=successfull');
+            } catch (error) {
+                res.redirect('/course/create?status=fail');
+            }
         }
     }
 
     async editCourse(req, res, next) {
         let { courseId, courseName, courseDescription } = req.body
-
+        let data = [];
         //Course Name must be A-Z, a-z, 0-9
         const JoiSchema = Joi.object({
             courseId: Joi.string().required(),
-            courseName: Joi.string().regex(/^A-Za-z0-9_./).required(), 
+            courseName: Joi.string().regex(/[^A-Za-z0-9]/).required(), 
             courseDescription: Joi.string().required()
           }).options({ abortEarly: false });          
 
         const { error } = JoiSchema.validate({ courseId, courseName, courseDescription });
 
         if (error) {
-            res.render('detail', { error: error.details.map(item => item.message) })
+            res.redirect(`/course/${courseId}?status=fail`);
             return;
-        }
-
-        const objectId = new mongoose.Types.ObjectId(courseId)
-        try {
-            await Course.findByIdAndUpdate(courseId, { _id: objectId, courseName, courseDescription })
-            res.redirect(`/course/${courseId}?status=successfull`);
-        } catch (error) {
-            res.render('detail', { error: 'Chỉnh sửa khóa học thất bại' })
+        } else {
+            const objectId = new mongoose.Types.ObjectId(courseId)
+            try {
+                await Course.findByIdAndUpdate(courseId, { _id: objectId, courseName, courseDescription })
+                res.redirect(`/course/${courseId}?status=successfull`);
+            } catch (error) {
+                res.redirect(`/course/${courseId}?status=fail`);
+            }
         }
     }
 
@@ -105,45 +103,43 @@ class CourseController {
     // Handle request from POSTMAN
     async getApiAll(req, res, next) {
         let data = [];
-        let error = undefined;
         try {
             await Course.find().then(async courses => {
                 if (courses) {
                     data.push(...courses)
                     data = await this.mappingSection(data);
-                    res.status(200).json({ data, error });
+                    res.status(200).json({ data });
                 } else {
-                    res.status(400).json({ data, error: 'Lấy danh sách không thành công' })
+                    res.status(400).json({ data })
                 }
             })
         } catch (error) {
-            res.status(400).json({ data, error: 'Lấy danh sách không thành công' })
+            res.status(400).json({ data })
         }
     }
 
     async getApiCourseDetail(req, res, next) {
         let data = [];
-        let error = undefined;
         try {
             await Course.findOne({_id: req.params.id}).then(async courses => {
                 if (courses) {
                     data.push(courses);
                     data = await this.mappingSection(data);
-                    res.status(200).json({ data, error });
+                    res.status(200).json({ data });
                 } else {
-                    res.status(400).json({ data, error: 'Lấy danh sách không thành công' })
+                    res.status(400).json({ message: 'Get course detail fail'})
                 }
             })
         }
         catch (error) {
-            res.status(400).json({ data, error: 'Lấy danh sách không thành công' })
+            res.status(400).json({ message: 'Get course detail fail' });
         }
     }
 
     async createApiCourse(req, res, next) {
         let { courseId, courseName, courseDescription } = req.body
         const JoiSchema = Joi.object({
-            courseName: Joi.string().regex(/^[A-Z][a-z0-9\s\/]*$/).required(),
+            courseName: Joi.string().regex(/[^A-Za-z0-9]/).required(),
             courseDescription: Joi.string().required()
         }).options({ abortEarly: false });
 
@@ -155,7 +151,7 @@ class CourseController {
             const newCourse = new Course({ courseName, courseDescription })
             try {
                 await newCourse.save()
-                res.status(200).json({ message: 'Create course successfull' });
+                res.status(200).json({ data: newCourse, message: 'Create course successfull' });
             } catch (error) {
                 res.status(400).json({ message: 'Create course fail' });
             }
@@ -168,7 +164,7 @@ class CourseController {
         //Course Name must be A-Z, a-z, 0-9
         const JoiSchema = Joi.object({
             courseId: Joi.string().required(),
-            courseName: Joi.string().regex(/^[A-Z][a-z0-9\s\/]*$/).required(), 
+            courseName: Joi.string().regex(/[^A-Za-z0-9]/).required(), 
             courseDescription: Joi.string().required()
           }).options({ abortEarly: false });          
 
@@ -179,8 +175,8 @@ class CourseController {
         } else {
             const objectId = new mongoose.Types.ObjectId(courseId)
             try {
-                await Course.findByIdAndUpdate(courseId, { _id: objectId, courseName, courseDescription })
-                res.status(200).json({ message: 'Edit course successfull' });
+                const course = await Course.findByIdAndUpdate(courseId, { _id: objectId, courseName, courseDescription })
+                res.status(200).json({ data: course, message: 'Edit course successfull' });
             } catch (error) {
                 res.status(400).json({ message: 'Edit course fail' })
             }

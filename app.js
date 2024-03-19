@@ -9,6 +9,7 @@ const dotenv = require('dotenv');
 var courseRouter = require('./routes/course');
 var authRouter = require('./routes/auth');
 var sectionRouter = require('./routes/section');
+var apiRouter = require('./routes/api');
 var dashboardRouter = require('./routes/dashboard');
 
 const session = require('express-session');
@@ -50,7 +51,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/course', courseRouter);
 app.use('/section', sectionRouter);
 app.use('/auth', authRouter);
-app.use('/api', dashboardRouter);
+app.use('/api', apiRouter);
+app.use('/dashboard', dashboardRouter);
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONG_URI)

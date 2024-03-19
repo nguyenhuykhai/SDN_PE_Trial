@@ -1,40 +1,34 @@
 var express = require('express');
 var dashboardRouter = express.Router();
 const bodyParser = require('body-parser');
-const courseController = require('../controllers/courseController')
-const memberController = require('../controllers/memberController')
+const dashboardController = require('../controllers/dashboardController')
 const { jwtDecode, ensureAuthenticated } = require('../config/auth')
 
 dashboardRouter.use(bodyParser.urlencoded({ extended: true }));
 
-// Xử lý REST API với Course
-dashboardRouter.get('/course', async function (req, res, next) {
-    courseController.getApiAll(req, res, next);
+// Display dashboard view
+dashboardRouter.get('/', ensureAuthenticated, jwtDecode, async function (req, res, next) {
+    dashboardController.getAll(req, res, next);
 });
 
-dashboardRouter.get('/course/:id', async function (req, res, next) {
-    courseController.getApiCourseDetail(req, res, next);
-});
-
-dashboardRouter.post('/course', ensureAuthenticated, jwtDecode, async function (req, res, next) {
-    courseController.createApiCourse(req, res, next);
-});
-
-dashboardRouter.put('/course/:id', ensureAuthenticated, jwtDecode, async function (req, res, next) {
-    courseController.editApiCourse(req, res, next);
-});
-
-dashboardRouter.delete('/course/:id', ensureAuthenticated, jwtDecode, async function (req, res, next) {
-    courseController.deleteApiCourse(req, res, next);
-});
-
-// Xử lý Authenticate với POSTMAN
-dashboardRouter.post('/auth/login', async function(req, res, next) {
-    memberController.handleApiLogin(req, res, next)
+dashboardRouter.post('/', ensureAuthenticated, jwtDecode, async function (req, res, next) {
+    dashboardController.createItem(req, res, next);
 })
-  
-dashboardRouter.get('/auth/logout', ensureAuthenticated, jwtDecode, async function(req, res, next) {
-    memberController.handleApiSignout(req, res, next)
+
+dashboardRouter.get('/create', ensureAuthenticated, jwtDecode, async function (req, res, next) {
+    res.render('dashboardForm');
+})
+
+dashboardRouter.get('/:id', ensureAuthenticated, jwtDecode, async function (req, res, next) {
+    dashboardController.getDetail(req, res, next);
+});
+
+dashboardRouter.post('/:id/edit', ensureAuthenticated, jwtDecode, async function (req, res, next) {
+    dashboardController.editItem(req, res, next);
+});
+
+dashboardRouter.get('/:id/delete', ensureAuthenticated, jwtDecode, async function (req, res, next) {
+    dashboardController.deleteItem(req, res, next);
 });
 
 module.exports = dashboardRouter;
