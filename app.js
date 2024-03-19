@@ -11,15 +11,11 @@ var authRouter = require('./routes/auth');
 var sectionRouter = require('./routes/section');
 var apiRouter = require('./routes/api');
 var dashboardRouter = require('./routes/dashboard');
-
 const session = require('express-session');
-const passport = require('passport');
-const flash = require('connect-flash');
 
 
 dotenv.config();
 var app = express();
-require('./config/passport')(passport);
 app.use(
   session({
       secret: 'secret',
@@ -27,16 +23,7 @@ app.use(
       saveUninitialized: true
   })
 );
-app.use(passport.initialize());
-app.use(passport.session());
-app.use(flash());
 app.use(cookieParser());
-app.use(function (req, res, next) {
-  res.locals.success_msg = req.flash('success_msg')
-  res.locals.error_msg = req.flash('error_msg')
-  res.locals.error = req.flash('error')
-  next();
-});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

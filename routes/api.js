@@ -3,7 +3,7 @@ var apiRouter = express.Router();
 const bodyParser = require('body-parser');
 const courseController = require('../controllers/courseController')
 const memberController = require('../controllers/memberController')
-const { jwtDecode, ensureAuthenticated } = require('../config/auth')
+const { jwtDecodeApi } = require('../config/auth')
 
 apiRouter.use(bodyParser.urlencoded({ extended: true }));
 
@@ -16,15 +16,15 @@ apiRouter.get('/course/:id', async function (req, res, next) {
     courseController.getApiCourseDetail(req, res, next);
 });
 
-apiRouter.post('/course', ensureAuthenticated, jwtDecode, async function (req, res, next) {
+apiRouter.post('/course', jwtDecodeApi, async function (req, res, next) {
     courseController.createApiCourse(req, res, next);
 });
 
-apiRouter.put('/course/:id', ensureAuthenticated, jwtDecode, async function (req, res, next) {
+apiRouter.put('/course/:id', jwtDecodeApi, async function (req, res, next) {
     courseController.editApiCourse(req, res, next);
 });
 
-apiRouter.delete('/course/:id', ensureAuthenticated, jwtDecode, async function (req, res, next) {
+apiRouter.delete('/course/:id', jwtDecodeApi, async function (req, res, next) {
     courseController.deleteApiCourse(req, res, next);
 });
 
@@ -33,7 +33,7 @@ apiRouter.post('/auth/login', async function(req, res, next) {
     memberController.handleApiLogin(req, res, next)
 })
   
-apiRouter.get('/auth/logout', ensureAuthenticated, jwtDecode, async function(req, res, next) {
+apiRouter.get('/auth/logout', jwtDecodeApi, async function(req, res, next) {
     memberController.handleApiSignout(req, res, next)
 });
 

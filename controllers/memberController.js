@@ -59,58 +59,78 @@ class MemberController {
             })
         }
     }
+
     async login(req, res) {
-        res.render('login', { message: 'Trang đăng nhập' });
+        res.render('login', { message: 'Login Page' });
     }
+
     async handleLogin(req, res) {
-        passport.authenticate('local', {
-            failureRedirect: '/auth',
-            failureFlash: true
-        })(req, res, async function(err) {
-            if (err) {
-                res.render('login', { error: 'Đăng nhập không thành công' })
-            }
-            if (req.user) {
-                let user = { _id: req.user._id, username: req.user.username }
-                const token = jwt.sign({ _id: user.id, username: user.username }, 'SDN301m');
-                res.cookie('token', token, {maxAge: 900000, httpOnly: true});
-                res.redirect('/course');
-            } else {
-                res.render('login', { error: 'Đăng nhập không thành công' })
-            }
-        });
+        let { username, password } = req.body;
+        //Match user
+        try {
+            Members.findOne({ username: username }).then(member => {
+                if (!member) {
+                    res.render('login', { error: 'Login failed' })
+                } else {
+                    //Match password
+                    bcrypt.compare(password, member.password, (err, isMatch) => {
+                        if (err) throw err;
+                        if (isMatch) {
+                            let user = { _id: member._id, username: member.username }
+                            const token = jwt.sign({ _id: user.id, username: user.username }, 'SDN301m');
+                            res.cookie('token', token, { maxAge: 900000, httpOnly: true });
+                            res.redirect('/course');
+                        } else {
+                            res.render('login', { error: 'Incorrect password' })
+                        }
+                    })
+                }
+            })
+        } catch (error) {
+            res.render('login', { error: 'Incorrect password' })
+        }
     }
+
     async signout(req, res, next) {
-        req.logout(function (err) {
-            if (err) { return next(err); }
-            res.render('login', { message: 'Đăng xuất thành công' });
-        })
+        // Remove token from cookie
+        res.clearCookie('token');
+        res.render('login', { message: 'Logout successfull' });
     }
 
     // Xử lý Authenticate với POSTMAN
     async handleApiLogin(req, res, next) {
-        passport.authenticate('local', {
-            failureFlash: true
-        })(req, res, async function(err) {
-            if (err) {
-                res.status(400).json({ error: 'Đăng nhập không thành công' })
-            }
-            if (req.user) {
-                let user = { _id: req.user._id, username: req.user.username }
-                const token = jwt.sign({ _id: user.id, username: user.username }, 'SDN301m');
-                res.cookie('token', token, {maxAge: 900000, httpOnly: true});
-                res.status(200).json({ user, token });
-            } else {
-                res.status(400).json({ error: 'Đăng nhập không thành công' })
-            }
-        }); 
+        let { username, password } = req.body;
+        //Match user
+        try {
+            Members.findOne({ username: username }).then(member => {
+                if (!member) {
+                    res.status(4000).json({ error: 'Login failed' })
+                } else {
+                    //Match password
+                    bcrypt.compare(password, member.password, (err, isMatch) => {
+                        if (err) throw err;
+                        if (isMatch) {
+                            let user = { _id: member._id, username: member.username }
+                            // Convert Object to String
+                            const userId = user._id.toString();
+                            const token = jwt.sign({ _id: user.id, username: user.username }, 'SDN301m');
+                            res.cookie('token', token, { maxAge: 900000, httpOnly: true });
+                            res.status(200).json({ id: userId, username: user.username , token });
+                        } else {
+                            res.status(400).json({ error: 'Incorrect password' })
+                        }
+                    })
+                }
+            })
+        } catch (error) {
+            res.status(400).json({ error: 'Incorrect password' })
+        }
     }
 
     async handleApiSignout(req, res, next) {
-        req.logout(function (err) {
-            if (err) { return next(err); }
-            res.status(200).json({ message: 'Đăng xuất thành công' });
-        })
+        // Remove token from cookie
+        res.clearCookie('token');
+        res.status(200).json({ message: 'Logout successfull' });
     }
 }
 

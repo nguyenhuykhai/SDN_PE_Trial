@@ -108,7 +108,7 @@ class CourseController {
                 if (courses) {
                     data.push(...courses)
                     data = await this.mappingSection(data);
-                    res.status(200).json({ data });
+                    res.status(200).json( data );
                 } else {
                     res.status(400).json({ data })
                 }
@@ -125,7 +125,7 @@ class CourseController {
                 if (courses) {
                     data.push(courses);
                     data = await this.mappingSection(data);
-                    res.status(200).json({ data });
+                    res.status(200).json( data[0] );
                 } else {
                     res.status(400).json({ message: 'Get course detail fail'})
                 }
@@ -137,7 +137,7 @@ class CourseController {
     }
 
     async createApiCourse(req, res, next) {
-        let { courseId, courseName, courseDescription } = req.body
+        let { courseName, courseDescription } = req.body
         const JoiSchema = Joi.object({
             courseName: Joi.string().regex(/[^A-Za-z0-9]/).required(),
             courseDescription: Joi.string().required()
@@ -151,7 +151,7 @@ class CourseController {
             const newCourse = new Course({ courseName, courseDescription })
             try {
                 await newCourse.save()
-                res.status(200).json({ data: newCourse, message: 'Create course successfull' });
+                res.status(200).json( newCourse );
             } catch (error) {
                 res.status(400).json({ message: 'Create course fail' });
             }
@@ -176,7 +176,7 @@ class CourseController {
             const objectId = new mongoose.Types.ObjectId(courseId)
             try {
                 const course = await Course.findByIdAndUpdate(courseId, { _id: objectId, courseName, courseDescription })
-                res.status(200).json({ data: course, message: 'Edit course successfull' });
+                res.status(200).json( course );
             } catch (error) {
                 res.status(400).json({ message: 'Edit course fail' })
             }
